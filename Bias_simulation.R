@@ -171,6 +171,109 @@ summary(reg_mes_err_non_orth)
 #####
 
 #####
+#Controlling for a constant
+
+
+###################################################
+# Regression of centered variables without constant.
+set.seed(18)
+V = diag(3) #variance matrix : base will be orthogonal and normed vectors.
+X = mvrnorm(n=50000, mu = c(0,0,0), Sigma = V)
+
+x1 = X[,1]
+x2 = X[,2]
+x3 = rep(1,50000)
+
+y = 1/sqrt(2)*x1 + 1/sqrt(2)*x2
+mean(y)     # means of variables are "almost 0"
+mean(x1)
+mean(x2)
+reg_centered = lm(y~x1+x2-1)  #adding -1 in the formula specifies that
+                              #no constant should be added to the regressors
+reg_centered
+
+# Regression of non centred variables without constant
+yo = y+400
+x1o = x1+100
+x2o = x2+300
+mean(yo)    # variables a no longer centered
+mean(x1o)
+mean(x2o)
+reg_offset = lm(yo~x1o+x2o-1)
+
+reg_offset
+sum(reg_offset$coefficients * c(100,300))
+
+# Regression of non centred  variables with a constant
+
+reg_constant = lm(yo~x1o+x2o+x3-1) # Remember that x3 contains ones
+reg_constant
+
+
+
+
+
+
+###########################
+# Illustrating the use of a constant in 3D
+
+base <- diag(3)
+rownames(base) <- c("x1", "x2", "1")
+
+vec = matrix(1/sqrt(2)*base[1,]+sqrt(1-1/sqrt(2)^2)*base[2,], nrow = 1)
+rownames(vec) = "Y"
+open3d()
+planes3d(0, 0, 1, 0, col="gray", alpha=0.2)
+
+vectors3d(base, col = "black")
+vectors3d(vec, col = "red")
+segments3d(rbind(c(1/sqrt(2),0,0),c(1/sqrt(2),1/sqrt(2),0)))
+segments3d(rbind(c(0,1/sqrt(2),0),c(1/sqrt(2),1/sqrt(2),0)))
+# close3d()
+open3d()
+
+names(base) = NULL
+vecX1O = matrix(base[1,]+1*base[3,], nrow = 1)
+vecX2O = matrix(base[2,]+3*base[3,], nrow = 1)
+vecY = matrix(1/sqrt(2)*base[1,]+1/sqrt(2)*base[2,]+4*base[3,], nrow = 1)
+vec = rbind(vecX1O, vecX2O, vecY)
+rownames(vec) = c("x1o", "x2o", "yo")
+
+planes3d(0, 0, 1, 0, col="gray", alpha=0.2)
+vectors3d(base, col = "black")
+vectors3d(vec, col = "blue")
+segments3d(rbind(c(1/sqrt(2),0,0),c(1/sqrt(2),1/sqrt(2),0)))
+segments3d(rbind(c(0,1/sqrt(2),0),c(1/sqrt(2),1/sqrt(2),0)))
+segments3d(rbind(c(0,1,0),c(0,1,3)))
+segments3d(rbind(c(1,0,0),c(1,0,1)))
+segments3d(rbind(c(1/sqrt(2),1/sqrt(2),0),c(1/sqrt(2),1/sqrt(2),4)))
+
+open3d()
+
+names(base) = NULL
+vecX1O = matrix(base[1,]+2*base[3,], nrow = 1)
+vecX2O = matrix(base[2,]+6*base[3,], nrow = 1)
+vecY = matrix(1/sqrt(2)*base[1,]+1/sqrt(2)*base[2,]+8*base[3,], nrow = 1)
+vec = rbind(vecX1O, vecX2O, vecY)
+rownames(vec) = c("x1o", "x2o", "yo")
+
+planes3d(0, 0, 1, 0, col="gray", alpha=0.2)
+vectors3d(base, col = "black")
+vectors3d(vec, col = "green")
+segments3d(rbind(c(1/sqrt(2),0,0),c(1/sqrt(2),1/sqrt(2),0)))
+segments3d(rbind(c(0,1/sqrt(2),0),c(1/sqrt(2),1/sqrt(2),0)))
+segments3d(rbind(c(0,1,0),c(0,1,6)))
+segments3d(rbind(c(1,0,0),c(1,0,2)))
+segments3d(rbind(c(1/sqrt(2),1/sqrt(2),0),c(1/sqrt(2),1/sqrt(2),8)))
+
+close3d()
+close3d()
+close3d()
+sum((lm(y1~x1+x2-1)$coefficients)*c(1,2))
+
+
+
+
 
 #Categorical variable
 normR2 = function(x){
