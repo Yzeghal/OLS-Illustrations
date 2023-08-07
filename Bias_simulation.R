@@ -269,6 +269,8 @@ segments3d(rbind(c(1/sqrt(2),1/sqrt(2),0),c(1/sqrt(2),1/sqrt(2),8)))
 close3d()
 close3d()
 close3d()
+
+
 sum((lm(y1~x1+x2-1)$coefficients)*c(1,2))
 
 
