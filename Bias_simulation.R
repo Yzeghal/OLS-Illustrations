@@ -176,7 +176,7 @@ summary(reg_mes_err_non_orth)
 
 ###################################################
 # Regression of centered variables without constant.
-set.seed(18)
+#set.seed(19)
 V = diag(3) #variance matrix : base will be orthogonal and normed vectors.
 X = mvrnorm(n=50000, mu = c(0,0,0), Sigma = V)
 
