@@ -176,13 +176,13 @@ summary(reg_mes_err_non_orth)
 
 ###################################################
 # Regression of centered variables without constant.
-#set.seed(19)
+set.seed(18)
 V = diag(3) #variance matrix : base will be orthogonal and normed vectors.
 X = mvrnorm(n=50000, mu = c(0,0,0), Sigma = V)
 
 x1 = X[,1]
 x2 = X[,2]
-x3 = rep(1,50000)
+d = rep(1,50000)
 
 y = 1/sqrt(2)*x1 + 1/sqrt(2)*x2
 mean(y)     # means of variables are "almost 0"
@@ -206,7 +206,7 @@ sum(reg_offset$coefficients * c(100,300))
 
 # Regression of non centred  variables with a constant
 
-reg_constant = lm(yo~x1o+x2o+x3-1) # Remember that x3 contains ones
+reg_constant = lm(yo~x1o+x2o+d-1) # Remember that x3 contains ones
 reg_constant
 
 
