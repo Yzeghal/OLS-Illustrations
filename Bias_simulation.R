@@ -131,9 +131,8 @@ vectors3d(vec, color=rep("black",3), lwd=2, cex.lab =2)
 planes3d(0, 0, 1, 0, col="gray", alpha=0.2)
 
 
-# show some orthogonal vectors
-
 #####
+# First regression 
 set.seed(18)
 V = diag(3) # variance matrix 
 E = mvrnorm(n=50000, mu = c(0,0,0), Sigma = V)
@@ -151,20 +150,64 @@ reg1 = lm(y~e2-1) # -1 specifies not to add a constant to the model.
 reg1
 R2(reg1)          # ~0.5 as expected : ||e2||^2/||e2+e3||^2
 
-# X1 is a random variable of L2 norm 1.
+# 3D representation of reg1
 
-x1 = 1/sqrt(2)*e1+1/sqrt(2)*e2 
+
+open3d()
+planes3d(0, 0, 1, 0, col="lightgrey")
+
+vectors3d(base[c(1,3),], col = "black",  lwd = 2)
+vectors3d(c(0,1,1), col ="red",  lwd = 2, labels = "Y")
+vectors3d(base[2,], col = "blue4",  lwd = 2, labels ="e2")
+segments3d(rbind(c(0,1,0),c(0,1,1)), col = "red")
+corner(c(0,0,0),c(0,1,0),c(0,1,1), col = "red")
+light3d(0, 0)
+light3d(0, 0)
+close3d()
+
+
+
+# 2nd step : adding a correlated variable does not necessarily generate bias if it is orthogonal to epsilon
+
+x1 = 1/sqrt(2)*e1+1/sqrt(2)*e2 # X1 is a random variable of L2 norm 1.
 mean(x1^2) # estimates the norm of X1
+cor(x1,e2)
+reg2 = lm(y~e2+x1-1)
+reg2
+R2(reg2)
+base <- diag(3)
+rownames(base) <- c("e1", "e2", "e3")
 
+# 3D representation of reg2
 
-#
-#Construction of included variable bias 
-#####
+vec = matrix(1/sqrt(2)*base[1,]+1/sqrt(2)*base[2,], nrow = 1)
+vec = rbind(vec,  matrix(c(0,1,0), nrow = 1) )
+rownames(vec) = c("X1","")
+open3d()
+planes3d(0, 0, 1, 0, col="cornflowerblue")
 
+vectors3d(base[c(1,3),], col = "black",  lwd = 2)
+vectors3d(c(0,1,1), col ="red",  lwd = 2, labels = "Y")
+vectors3d(base[2,], col = "blue4",  lwd = 2, labels ="e2")
+vectors3d(vec, col = "blue4", lwd = 2)
+segments3d(rbind(c(0,1,0),c(0,1,1)), col = "red")
+corner(c(0,0,0),c(0,1,0),c(0,1,1), col = "red")
 
-# 2nd step : adding a correlated variable does not generate bias if it is orthogonal to epsilon
-reg2 = lm(y~e2+x1)
-summary(reg2)
+light3d(0, 0)
+light3d(0, 0)
+light3d(0, 0)
+close3d()
+
+# 3rd step : A control orthogonal to e2 cannnot change its coefficient.
+
+xo = 1/sqrt(2)*e1+1/sqrt(2)*e3
+
+cor(xo,e2)  # "Almost" 0
+
+reg3 = lm(y~e2+xo-1)
+reg3
+
+R2(reg3)
 
 
 # 3rd step : adding more noise to x1, that would reduce actual noise.
