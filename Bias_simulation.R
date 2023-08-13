@@ -181,8 +181,8 @@ rownames(base) <- c("e1", "e2", "e3")
 # 3D representation of reg2
 
 vec = matrix(1/sqrt(2)*base[1,]+1/sqrt(2)*base[2,], nrow = 1)
-vec = rbind(vec,  matrix(c(0,1,0), nrow = 1) )
-rownames(vec) = c("X1","")
+
+rownames(vec) = "X1"
 open3d()
 planes3d(0, 0, 1, 0, col="cornflowerblue")
 
@@ -208,7 +208,36 @@ reg3 = lm(y~e2+xo-1)
 reg3
 
 R2(reg3)
+vec =rbind( 1/sqrt(2)*c(1,0,1), c(0,1,0)) %*% base
+rownames(vec) = c("Xo", "e2")
+pointfall = t(vec)%*%project(t(vec))%*% matrix(c(0,1,1), nrow = 3)
+open3d()
+planes3d(0, 0, 1, 0, col="lightgrey")
+planes3d(1, 0,-1, 0, col = "cornflowerblue")
+vectors3d(base[c(1,3),], col = "black",  lwd = 2)
+vectors3d(vec, col = "blue4", lwd = 2)
+vectors3d(c(0,1,1),label = "Y", col = "red", lwd = 2)
+segments3d(rbind(c(0,0,0),t(pointfall)), col = "red")
+segments3d(rbind(t(pointfall),c(0,1,1)), col = "red")
+segments3d(rbind(t(pointfall),c(0,1,0)), col = "black")
+corner(c(0,0,0),as.vector(pointfall),c(0,1,1), col = "red")
+corner(c(0,0,0),c(0,1,0),as.vector(pointfall), col = "black")
 
+light3d(0,0)
+light3d(0,0)
+
+open3d()
+planes3d(0, 0, 1, 0, col="lightgrey")
+vectors3d(base[c(1,3),], col = "black",  lwd = 2)
+vectors3d(vec, col = "blue4", lwd = 2)
+vectors3d(c(0,1,1),label = "Y", col = "red", lwd = 2)
+segments3d(rbind(c(0,1,0),c(0,1,1)), col = "red")
+corner(c(0,0,0),c(0,1,0),c(0,1,1), col = "red")
+light3d(0, 0)
+light3d(0, 0)
+
+close3d()
+close3d()
 
 # 3rd step : adding more noise to x1, that would reduce actual noise.
 x1e = x1+e3 
