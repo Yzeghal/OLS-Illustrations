@@ -9,6 +9,8 @@ library(stats) #summarise regressions with asymptotic sd estimators (non heteros
 library(matrixcalc)  # Used for matrix inverse
 library (matlib)
 library(rgl)#usedfor 3d representation
+source("C:/Users/yanis.zeghal/Documents/GitHub/OLS-Illustrations/Projections.R")
+
 #Coded a R2 that is faster to call than $r.squared
 R2 = function(m){
   #takes a lm object and yields the Rsquared
@@ -152,6 +154,8 @@ R2(reg1)          # ~0.5 as expected : ||e2||^2/||e2+e3||^2
 
 # 3D representation of reg1
 
+base <- diag(3)
+rownames(base) <- c("e1", "e2", "e3")
 
 open3d()
 planes3d(0, 0, 1, 0, col="lightgrey")
@@ -175,11 +179,11 @@ cor(x1,e2)
 reg2 = lm(y~e2+x1-1)
 reg2
 R2(reg2)
-base <- diag(3)
-rownames(base) <- c("e1", "e2", "e3")
+
 
 # 3D representation of reg2
-
+base <- diag(3)
+rownames(base) <- c("e1", "e2", "e3")
 vec = matrix(1/sqrt(2)*base[1,]+1/sqrt(2)*base[2,], nrow = 1)
 
 rownames(vec) = "X1"
@@ -238,6 +242,78 @@ light3d(0, 0)
 
 close3d()
 close3d()
+
+
+# 3rd step : adding a control in vect(e2, eta) may induce bias
+xc = e3+1/2*e2
+reg3 = lm(y~e2+xc-1)
+reg3
+R2(reg3)
+
+# 3D representation of reg4
+vec =rbind(c(0,0.5,1), c(0,1,0)) %*% base
+rownames(vec) = c("Xc", "e2")
+
+open3d()
+planes3d(0, 0, 1, 0, col="lightgrey")
+planes3d(1, 0, 0, 0, col = "cornflowerblue")
+vectors3d(base[c(1,3),], col = "black",  lwd = 2)
+vectors3d(vec, col = "blue4", lwd = 2)
+vectors3d(c(0,1,1),label = "Y", col = "red", lwd = 2)
+
+# more cases of reg4
+userMat = matrix(c(0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,1),byrow = TRUE, nrow = 4)
+
+for (i in 1:6){
+  open3d()
+  
+  vecxc =matrix(c(0,0.3*i,1),nrow= 1)
+  
+  rownames(vecxc) = "Xc"
+  vectors3d(base,lwd=2)
+  segments3d(rbind(c(0,1,1),  c(0.0001,0.3*i,1)), col= "blue4", lwd=2)
+  if(i<=1/0.3){
+    cone3d(tip = c(0.001,0.1,0), base= c(0,0.9,1) ,length = 0.05, radius= 0.02, col = "blue4" )
+
+  }
+  else{
+    cone3d(tip = c(0.001,-0.1,0), base= c(0,1.1,1),length = 0.05, radius= 0.02, col = "blue4")
+
+  }
+  vectors3d(vecxc, col = "blue4",lwd=2)
+  vectors3d(c(0,1,1),label = "Y", col = "red", lwd = 2)
+  planes3d(0, 0, 1, 0, col="lightgrey")
+  planes3d(1, 0, 0, 0, col = "cornflowerblue")
+  view3d(userMatrix = userMat)
+  
+  light3d(90,0)
+  light3d(90,0)
+  
+}
+corner(c(0,1,0), c(0,0,0), c(0,1.8,1))
+
+close3d()
+close3d()
+close3d()
+close3d()
+close3d()
+close3d()
+close3d()
+close3d()
+
+open3d()
+planes3d(0, 0, 1, 0, col="lightgrey")
+planes3d(1, 0, 0, 0, col = "cornflowerblue")
+vectors3d(base[c(1,3),], col = "black",  lwd = 2)
+vectors3d(vec, col = "blue4", lwd = 2)
+vectors3d(c(0,1,1),label = "Y", col = "red", lwd = 2)
+
+segments3d(rbind(c(0,0,0),t(pointfall)), col = "red")
+segments3d(rbind(t(pointfall),c(0,1,1)), col = "red")
+segments3d(rbind(t(pointfall),c(0,1,0)), col = "black")
+corner(c(0,0,0),as.vector(pointfall),c(0,1,1), col = "red")
+corner(c(0,0,0),c(0,1,0),as.vector(pointfall), col = "black")
+
 
 # 3rd step : adding more noise to x1, that would reduce actual noise.
 x1e = x1+e3 
