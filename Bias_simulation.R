@@ -9,7 +9,7 @@ library(stats) #summarise regressions with asymptotic sd estimators (non heteros
 library(matrixcalc)  # Used for matrix inverse
 library (matlib)
 library(rgl)#usedfor 3d representation
-source("C:/Users/yanis.zeghal/Documents/GitHub/OLS-Illustrations/Projections.R")
+source("C:/Users/tayoy/Documents/GitHub/OLS-Illustrations/Projections.R")
 
 #Coded a R2 that is faster to call than $r.squared
 R2 = function(m){
@@ -254,15 +254,19 @@ R2(reg3)
 vec =rbind(c(0,0.5,1), c(0,1,0)) %*% base
 rownames(vec) = c("Xc", "e2")
 
+userMat = matrix(c(0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,1),byrow = TRUE, nrow = 4) # view from front
+userMat2= matrix(c(0,1,0,0,-0.5,0,1,0,1,0,0.5,0,0,0,0,1),byrow = TRUE, nrow = 4) #View from a little above
 open3d()
+view3d(userMatrix = userMat2)
 planes3d(0, 0, 1, 0, col="lightgrey")
 planes3d(1, 0, 0, 0, col = "cornflowerblue")
 vectors3d(base[c(1,3),], col = "black",  lwd = 2)
 vectors3d(vec, col = "blue4", lwd = 2)
 vectors3d(c(0,1,1),label = "Y", col = "red", lwd = 2)
 
+
 # more cases of reg4
-userMat = matrix(c(0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,1),byrow = TRUE, nrow = 4)
+
 
 for (i in 1:6){
   open3d()
@@ -282,15 +286,13 @@ for (i in 1:6){
   }
   vectors3d(vecxc, col = "blue4",lwd=2)
   vectors3d(c(0,1,1),label = "Y", col = "red", lwd = 2)
-  planes3d(0, 0, 1, 0, col="lightgrey")
   planes3d(1, 0, 0, 0, col = "cornflowerblue")
-  view3d(userMatrix = userMat)
-  
-  light3d(90,0)
-  light3d(90,0)
-  
+  planes3d(0,0,1,0, col = "lightgrey")
+  view3d(userMatrix = userMat2)
+
+  filename = paste("C:/Users/tayoy/Documents/ENSAE/RBB - Regressions/reg4.",i,".png", sep = "")
+  rgl.snapshot(filename, fmt = 'png')
 }
-corner(c(0,1,0), c(0,0,0), c(0,1.8,1))
 
 close3d()
 close3d()
@@ -299,7 +301,30 @@ close3d()
 close3d()
 close3d()
 close3d()
+
+open3d()
+
+vecxc = matrix(c(0,1 ,05/18),nrow= 1)
+vece2 = matrix(c(0,0.5,0),nrow= 1)
+veceps= matrix(c(0,1,1), nrow = 1)
+vecy = matrix(c(0,1,1), nrow = 1)
+rownames(vecy) = "Y"
+rownames(vecxc) = "Xc"
+rownames(vece2) = "e2"
+rownames(veceps) = "eta"
+vectors3d(base[3,],lwd=2)
+vectors3d(vece2,color = "blue4", lwd = 2)
+vectors3d(vecxc, origin = vece2, color = "blue4", lwd = 2,frac.lab = 0.5)
+vectors3d(veceps, origin = vecxc, color = "black", lwd = 2,frac.lab = 0.5)
+vectors3d(vecy, col = "red", lwd = 2,frac.lab = 0.5)
+planes3d(1, 0, 0, 0.0001, col = "cornflowerblue")
+planes3d(0,0,1,0, col = "lightgrey")
+view3d(userMatrix = userMat)
+
+filename = paste("C:/Users/tayoy/Documents/ENSAE/RBB - Regressions/reg4.",7,".png", sep = "")
+rgl.snapshot(filename, fmt = 'png')
 close3d()
+
 
 open3d()
 planes3d(0, 0, 1, 0, col="lightgrey")
@@ -314,25 +339,33 @@ segments3d(rbind(t(pointfall),c(0,1,0)), col = "black")
 corner(c(0,0,0),as.vector(pointfall),c(0,1,1), col = "red")
 corner(c(0,0,0),c(0,1,0),as.vector(pointfall), col = "black")
 
+######
+#Second part : mixed cases
 
-# 3rd step : adding more noise to x1, that would reduce actual noise.
-x1e = x1+e3 
-reg3 = lm(y~e2+x1e)
-# Here, giving a non 0 coeff to x1 enables us to reduce the mean sq error through e3, even though it requires to increase e1 and e2 coefficients.
-# Nothing can be done for e1, but e2 then compensate for the excess due to this minimisation choice.
+set.seed(18)
+V = diag(3) # variance matrix 
+E = mvrnorm(n=50000, mu = c(0,0,0), Sigma = V)
+e1 = E[,1]
+e2 = E[,2]
+e3 = E[,3]
+y = e3+e2
 
-summary(reg3)
-R2(reg3)
+# In between case 1 : 
+x1e = 1/sqrt(3)*e1 + 1/sqrt(3)*e2 + 1/sqrt(3)*e3
+reg5 = lm(y~e2+x1e-1)
+reg5
+R2(reg5)
 
 #Theoretical counterpart :
-A = matrix( c(sqrt(2)/2,sqrt(2)/2,1,0,1,0), nrow = 3) 
+A = matrix( c(1/sqrt(3),1/sqrt(3),1/sqrt(3),0,1,0), nrow = 3) 
 M = matrix.inverse(t(A)%*%A)%*%t(A)  # Vector-> coordinates in (x1e,e2) base.
-Beta_0 = M%*%c(0,1,1) #theoretical coefficients
-Beta_0
+gamma_0 = M%*%c(0,1,1) #theoretical coefficients
+rownames(gamma_0) = c("X1e", "e2")
+gamma_0
 
 #step 4.1 : controlling for e3 in step 3
-reg4.1 = lm(y~e2+x1e+e3)
-summary(reg4.1)
+reg4.1 = lm(y~e2+x1e+e3-1)
+reg4.1
 #here, allowing a non null coeff on x1e has a cost in the direction of e1.
 #step 4.2 : see what happens without this cost
 x3e = 1/sqrt(2) * e2 +e3
