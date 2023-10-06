@@ -27,25 +27,25 @@ R2 = function(m){
 ###################################################
 # Regression of centered variables without constant.
 set.seed(18)
-V = diag(3) #variance matrix : basis will be orthogonal and normed vectors.
-X = mvrnorm(n=50000, mu = c(0,0,0), Sigma = V)
+V = diag(2) #variance matrix : basis will be orthogonal and normed vectors.
+E = mvrnorm(n=50000, mu = c(0,0), Sigma = V)
 
-x1 = X[,1]
-x2 = X[,2]
-d = rep(1,50000)
+e1 = E[,1]
+e2 = E[,2]
+One = rep(1,50000)
 
-y = 1/sqrt(2)*x1 + 1/sqrt(2)*x2
+y = 1/sqrt(2)*e1 + 1/sqrt(2)*e2
 mean(y)     # means of variables are "almost 0"
-mean(x1)
-mean(x2)
-reg_centered = lm(y~x1+x2-1)  #adding -1 in the formula specifies that
-#no constant should be added to the regressors
+mean(e1)
+mean(e2)
+reg_centered = lm(y~e1+e2-1)  #adding -1 in the formula specifies that
+                              #no constant should be added to the regressors
 reg_centered
 
 # Regression of non centred variables without constant
 yo = y+400
-x1o = x1+100
-x2o = x2+300
+x1o = e1+100
+x2o = e2+300
 mean(yo)    # variables a no longer centered
 mean(x1o)
 mean(x2o)
@@ -56,7 +56,7 @@ sum(reg_offset$coefficients * c(100,300))
 
 # Regression of non centred  variables with a constant
 
-reg_constant = lm(yo~x1o+x2o+d-1) # Remember that x3 contains ones
+reg_constant = lm(yo~x1o+x2o+One-1) # Remember that ones contains ones
 reg_constant
 
 
@@ -68,17 +68,18 @@ reg_constant
 # Illustrating the use of a constant in 3D
 
 basis <- diag(3)
-rownames(basis) <- c("x1", "x2", "1")
+rownames(basis) <- c("E1", "E2", "1")
 
 vec = matrix(1/sqrt(2)*basis[1,]+sqrt(1-1/sqrt(2)^2)*basis[2,], nrow = 1)
 rownames(vec) = "Y"
 open3d()
-planes3d(0, 0, 1, 0, col="gray", alpha=0.2)
+planes3d(0, 0, 1, 0, col="cornflowerblue", alpha=0.4)
 
 vectors3d(basis, col = "black")
 vectors3d(vec, col = "red")
 segments3d(rbind(c(1/sqrt(2),0,0),c(1/sqrt(2),1/sqrt(2),0)))
 segments3d(rbind(c(0,1/sqrt(2),0),c(1/sqrt(2),1/sqrt(2),0)))
+light3d(0,0)
 close3d()
 open3d()
 
@@ -87,9 +88,9 @@ vecX1O = matrix(basis[1,]+1*basis[3,], nrow = 1)
 vecX2O = matrix(basis[2,]+3*basis[3,], nrow = 1)
 vecY = matrix(1/sqrt(2)*basis[1,]+1/sqrt(2)*basis[2,]+4*basis[3,], nrow = 1)
 vec = rbind(vecX1O, vecX2O, vecY)
-rownames(vec) = c("x1o", "x2o", "yo")
+rownames(vec) = c("X1o", "X2o", "Yo")
 
-planes3d(0, 0, 1, 0, col="gray", alpha=0.2)
+planes3d(0, 0, 1, 0, col="cornflowerblue", alpha=0.2)
 vectors3d(basis, col = "black")
 vectors3d(vec, col = "blue")
 segments3d(rbind(c(1/sqrt(2),0,0),c(1/sqrt(2),1/sqrt(2),0)))
@@ -105,9 +106,9 @@ vecX1O = matrix(basis[1,]+2*basis[3,], nrow = 1)
 vecX2O = matrix(basis[2,]+6*basis[3,], nrow = 1)
 vecY = matrix(1/sqrt(2)*basis[1,]+1/sqrt(2)*basis[2,]+8*basis[3,], nrow = 1)
 vec = rbind(vecX1O, vecX2O, vecY)
-rownames(vec) = c("x1o", "x2o", "yo")
+rownames(vec) = c("X1o", "X2o", "Yo")
 
-planes3d(0, 0, 1, 0, col="gray", alpha=0.2)
+planes3d(0, 0, 1, 0, col="cornflowerblue", alpha=0.2)
 vectors3d(basis, col = "black")
 vectors3d(vec, col = "green")
 segments3d(rbind(c(1/sqrt(2),0,0),c(1/sqrt(2),1/sqrt(2),0)))
