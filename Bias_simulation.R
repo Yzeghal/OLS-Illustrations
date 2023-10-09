@@ -7,7 +7,7 @@ library(stats) #summarise regressions with asymptotic sd estimators (non heteros
 library(matrixcalc)  # Used for matrix inverse
 library (matlib)
 library(rgl)#usedfor 3d representation
-source("C:/Users/tayoy/Documents/GitHub/OLS-Illustrations/Projections.R")
+source("C:/Users/Zeghal/Documents/GitHub/OLS-Illustrations/Projections.R")
 
 
 # Regression of centered variables without constant.
