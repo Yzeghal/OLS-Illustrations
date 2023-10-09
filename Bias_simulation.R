@@ -1,9 +1,7 @@
-#####
-# Script containing regressions of simulated variables to illustrate included and excluded variable bias.
-# In the first part, we construct included variable bias
-# In the second part, we construct ommitted variable bias
-# ...
-#####
+# Author: Yanis Zeghal
+# Illustrations of cases presented in "Controlling in Linear Regressions"
+
+
 library(MASS)  #mvnorm
 library(stats) #summarise regressions with asymptotic sd estimators (non heteroscedastic robust, use sandwich library for that)
 library(matrixcalc)  # Used for matrix inverse
@@ -11,20 +9,7 @@ library (matlib)
 library(rgl)#usedfor 3d representation
 source("C:/Users/tayoy/Documents/GitHub/OLS-Illustrations/Projections.R")
 
-#Coded a R2 that is faster to call than $r.squared
-R2 = function(m){
-  #takes a lm object and yields the Rsquared
-  if (class(m)!="lm"){
-    stop("Input i not a linear model")
-  }
-  x = m$model[,1]
-  SCT = sd(x)^2
-  SCR = sd(m$residuals)^2
-  R2 = 1-SCR/SCT
-  return(R2)
-}
 
-###################################################
 # Regression of centered variables without constant.
 set.seed(18)
 V = diag(2) #variance matrix : basis will be orthogonal and normed vectors.
